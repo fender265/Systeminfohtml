@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Systeeminfo</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 20px;
+  }
+  h1 { color: #38bdf8; }
+  .box {
+    background: #020617;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+  .label { color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<h1>Systeeminformatie</h1>
+
+<div class="box"><span class="label">IP-adres:</span> <span id="ip">Laden...</span></div>
+<div class="box"><span class="label">Browser:</span> <span id="browser"></span></div>
+<div class="box"><span class="label">Besturingssysteem:</span> <span id="os"></span></div>
+<div class="box"><span class="label">Taal:</span> <span id="lang"></span></div>
+<div class="box"><span class="label">Schermresolutie:</span> <span id="screen"></span></div>
+<div class="box"><span class="label">CPU cores:</span> <span id="cores"></span></div>
+<div class="box"><span class="label">RAM (geschat):</span> <span id="ram"></span></div>
+<div class="box"><span class="label">Grafische kaart:</span> <span id="gpu"></span></div>
+<div class="box"><span class="label">Platform:</span> <span id="platform"></span></div>
+<div class="box"><span class="label">Online status:</span> <span id="online"></span></div>
+
+<script>
+/* Basis info */
+document.getElementById("browser").textContent = navigator.userAgent;
+document.getElementById("lang").textContent = navigator.language;
+document.getElementById("screen").textContent = screen.width + " x " + screen.height;
+document.getElementById("cores").textContent = navigator.hardwareConcurrency || "Onbekend";
+document.getElementById("ram").textContent = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "Onbekend";
+document.getElementById("platform").textContent = navigator.platform;
+document.getElementById("online").textContent = navigator.onLine ? "Online" : "Offline";
+
+/* OS detectie */
+let os = "Onbekend";
+if (navigator.userAgent.includes("Win")) os = "Windows";
+if (navigator.userAgent.includes("Mac")) os = "MacOS";
+if (navigator.userAgent.includes("Linux")) os = "Linux";
+if (navigator.userAgent.includes("Android")) os = "Android";
+if (navigator.userAgent.includes("iPhone")) os = "iOS";
+document.getElementById("os").textContent = os;
+
+/* GPU info via WebGL */
+try {
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl");
+  const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+  const gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+  document.getElementById("gpu").textContent = gpu;
+} catch {
+  document.getElementById("gpu").textContent = "Niet beschikbaar";
+}
+
+/* Publiek IP (extern) */
+fetch("https://api.ipify.org?format=json")
+  .then(res => res.json())
+  .then(data => document.getElementById("ip").textContent = data.ip)
+  .catch(() => document.getElementById("ip").textContent = "Niet beschikbaar");
+</script>
+
+</body>
+</html>
